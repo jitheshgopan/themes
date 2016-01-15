@@ -22,6 +22,7 @@ class ThemesServiceProvider extends ServiceProvider {
 		$this->publishes([
 			__DIR__.'/../../config/themes.php' => config_path('themes.php')
 		]);
+        app('themes')->initialize();
 	}
 
 	/**
@@ -38,6 +39,8 @@ class ThemesServiceProvider extends ServiceProvider {
 		$this->registerServices();
 
 		$this->configureTwig();
+
+        $this->registerThemeViewfinder();
 	}
 
 	/**
@@ -89,4 +92,15 @@ class ThemesServiceProvider extends ServiceProvider {
 			$this->app['config']->push('sapling.extensions', 'Caffeinated\Themes\Twig\Extensions\Themes');
 		}
 	}
+
+    /*
+     * Registers custom viewFinder to load theme views
+     */
+    protected function registerThemeViewfinder() {
+        $this->app->bindShared('view.finder', function($app)
+        {
+            $paths = $app['config']['view.paths'];
+            return new ThemeViewFinder($app['files'], $paths);
+        });
+    }
 }

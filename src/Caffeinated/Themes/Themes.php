@@ -59,6 +59,12 @@ class Themes
 		$this->viewFactory = $viewFactory;
 	}
 
+    public function initialize()
+    {
+        //Manually activating the default theme set in config
+        $this->setActive($this->config->get('themes.active'));
+    }
+
 	/**
 	 * Register custom namespaces for all themes.
 	 *
@@ -148,13 +154,13 @@ class Themes
 
 	/**
 	 * Sets active theme.
-	 *
+	 * @param string $theme
 	 * @return Themes
 	 */
 	public function setActive($theme)
 	{
 		$this->active = $theme;
-
+        $this->setViewfinderPaths($theme);
 		return $this;
 	}
 
@@ -486,4 +492,34 @@ class Themes
 
 		return null;
 	}
+
+    /**
+     * Sets viewfinder paths based on a theme
+     *
+     * @param  string  $theme
+     */
+    public function setViewfinderPaths($theme = null)
+    {
+        $theme = $theme ? $theme : $this->getActive();
+        $paths = [];
+        $themeInTree = $theme;
+        do {
+            $path = $this->getThemeViewsPath($themeInTree);
+            if(!in_array($path, $paths))
+                $paths[] = $path;
+        } while ($themeInTree = $this->getProperty($themeInTree.'::parent'));
+
+        $defaultPaths = \Config::get('view.paths');
+        $paths = array_merge($paths, $defaultPaths);
+        $themeViewFinder = app('view.finder');
+        $themeViewFinder->setPaths($paths);
+    }
+
+    public function getThemeViewsPath($theme)
+    {
+        $path = $this->getThemePath($theme) . 'views';
+        return $path;
+    }
+
+
 }
