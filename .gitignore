@@ -1,2 +1,7 @@
 vendor/
 composer.lock
+.tmp
+.tmb
+.idea
+.DS_Store
+Thumbs.db
