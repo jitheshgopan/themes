@@ -60,13 +60,13 @@ class ThemesServiceProvider extends ServiceProvider {
 	 */
 	protected function registerServices()
 	{
-		$this->app->bindShared('themes.components', function($app) {
+		$this->app->singleton('themes.components', function($app) {
 			$blade = $app['view']->getEngineResolver()->resolve('blade')->getCompiler();
 
 			return new Components($app, $blade);
 		});
 
-		$this->app->bindShared('themes', function($app) {
+		$this->app->singleton('themes', function($app) {
 			return new Themes($app['files'], $app['config'], $app['view']);
 		});
 
@@ -97,7 +97,7 @@ class ThemesServiceProvider extends ServiceProvider {
      * Registers custom viewFinder to load theme views
      */
     protected function registerThemeViewfinder() {
-        $this->app->bindShared('view.finder', function($app)
+        $this->app->singleton('view.finder', function($app)
         {
             $paths = $app['config']['view.paths'];
             return new ThemeViewFinder($app['files'], $paths);
